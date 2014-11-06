@@ -1,0 +1,16 @@
+{
+  "name": "buffer.js",
+  "version": "1.0.0",
+  "description": "The adaptation of NodeJS::Buffer for client-side",
+  "main": "buffer.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exantrius/buffer.js.git"
+  },
+  "author": "Andrew Sednev <exantrius@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/exantrius/buffer.js/issues"
+  },
+  "homepage": "https://github.com/exantrius/buffer.js"
+}
