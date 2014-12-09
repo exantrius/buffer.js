@@ -8,6 +8,59 @@ function checkOffset(offset, ext, length) {
     }
 }
 
+//-----------------------------------------------------------
+function readFloatGeneric(buffer, offset, precision, isBigEndian) {
+    var value = 0;
+
+    if (isBigEndian) {
+        value  = buffer[offset + 1] << 16;
+        value |= buffer[offset + 2] << 8;
+        value |= buffer[offset + 3];
+        value  = value + (buffer[offset] << 24 >>> 0);
+    } else {
+        value  = buffer[offset + 2] << 16;
+        value |= buffer[offset + 1] << 8;
+        value |= buffer[offset];
+        value  = value + (buffer[offset + 3] << 24 >>> 0);
+    }
+
+    var sign = (value & 0x80000000) ? -1 : 1;
+    var exponent = ((value >> 23) & 0xFF) - 127;
+    var significand = (value & ~(-1 << 23));
+
+    if (exponent === 128) {
+        return sign * ((significand) ? Number.NaN : Number.POSITIVE_INFINITY);
+    }
+
+    if (exponent === -127) {
+        if (significand === 0) {
+            return sign * 0.0;
+        }
+        exponent = -126;
+        significand /= (1 << 22);
+    } else {
+        significand = (significand | (1 << 23)) / (1 << 23);
+    }
+
+    return sign * significand * Math.pow(2, exponent);    
+}
+
+Buffer.readFloatLE = function (buffer, offset, noAssert) {
+    offset = ~~offset;
+    if (!noAssert) {
+        checkOffset(offset, 4, buffer.length); 
+    }
+    return readFloatGeneric(buffer, offset, 4, false);
+};
+Buffer.readFloatBE = function (buffer, offset, noAssert) {
+    offset = ~~offset;
+    if (!noAssert) {
+        checkOffset(offset, 4, buffer.length); 
+    }
+    return readFloatGeneric(buffer, offset, 4, true);
+    
+};
+//-----------------------------------------------------------
 Buffer.readUInt8 = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -15,7 +68,7 @@ Buffer.readUInt8 = function(buffer, offset, noAssert) {
     }
     return buffer[offset];
 };
-
+//-----------------------------------------------------------
 function readUInt16(buffer, offset, isBigEndian) {
     var val = 0;
     if (isBigEndian) {
@@ -35,8 +88,6 @@ Buffer.readUInt16LE = function(buffer, offset, noAssert) {
     }
     return readUInt16(buffer, offset, false);
 };
-
-
 Buffer.readUInt16BE = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -44,8 +95,7 @@ Buffer.readUInt16BE = function(buffer, offset, noAssert) {
     }
     return readUInt16(buffer, offset, true);
 };
-
-
+//-----------------------------------------------------------
 function readUInt32(buffer, offset, isBigEndian) {
     var val = 0;
     if (isBigEndian) {
@@ -69,8 +119,6 @@ Buffer.readUInt32LE = function(buffer, offset, noAssert) {
     }
     return readUInt32(buffer, offset, false);
 };
-
-
 Buffer.readUInt32BE = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -78,7 +126,7 @@ Buffer.readUInt32BE = function(buffer, offset, noAssert) {
     }
     return readUInt32(buffer, offset, true);
 };
-
+//-----------------------------------------------------------
 Buffer.readInt8 = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -89,8 +137,7 @@ Buffer.readInt8 = function(buffer, offset, noAssert) {
     }
     return ((0xff - buffer[offset] + 1) * -1);
 };
-
-
+//-----------------------------------------------------------
 function readInt16(buffer, offset, isBigEndian) {
     var val = readUInt16(buffer, offset, isBigEndian);
     if (!(val & 0x8000)) {
@@ -99,7 +146,6 @@ function readInt16(buffer, offset, isBigEndian) {
     return (0xffff - val + 1) * -1;
 }
 
-
 Buffer.readInt16LE = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -107,8 +153,6 @@ Buffer.readInt16LE = function(buffer, offset, noAssert) {
     }
     return readInt16(buffer, offset, false);
 };
-
-
 Buffer.readInt16BE = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -116,8 +160,7 @@ Buffer.readInt16BE = function(buffer, offset, noAssert) {
     }
     return readInt16(buffer, offset, true);
 };
-
-
+//-----------------------------------------------------------
 function readInt32(buffer, offset, isBigEndian) {
     var val = readUInt32(buffer, offset, isBigEndian);
     if (!(val & 0x80000000)) {
@@ -126,7 +169,6 @@ function readInt32(buffer, offset, isBigEndian) {
     return (0xffffffff - val + 1) * -1;
 }
 
-
 Buffer.readInt32LE = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -134,8 +176,6 @@ Buffer.readInt32LE = function(buffer, offset, noAssert) {
     }
     return readInt32(buffer, offset, false);
 };
-
-
 Buffer.readInt32BE = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -143,7 +183,7 @@ Buffer.readInt32BE = function(buffer, offset, noAssert) {
     }
     return readInt32(buffer, offset, true);
 };
-
+//-----------------------------------------------------------
 function checkInt(buffer, value, offset, ext, max, min) {
     if (value > max || value < min) {
         throw new TypeError('value is out of bounds');
@@ -162,8 +202,6 @@ Buffer.writeUInt8 = function(buffer, value, offset, noAssert) {
     buffer[offset] = value;
     return offset + 1;
 };
-
-
 Buffer.writeUInt16LE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -174,8 +212,6 @@ Buffer.writeUInt16LE = function(buffer, value, offset, noAssert) {
     buffer[offset + 1] = (value >>> 8);
     return offset + 2;
 };
-
-
 Buffer.writeUInt16BE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -186,8 +222,6 @@ Buffer.writeUInt16BE = function(buffer, value, offset, noAssert) {
     buffer[offset + 1] = value;
     return offset + 2;
 };
-
-
 Buffer.writeUInt32LE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -200,8 +234,6 @@ Buffer.writeUInt32LE = function(buffer, value, offset, noAssert) {
     buffer[offset] = value;
     return offset + 4;
 };
-
-
 Buffer.writeUInt32BE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -214,8 +246,6 @@ Buffer.writeUInt32BE = function(buffer, value, offset, noAssert) {
     buffer[offset + 3] = value;
     return offset + 4;
 };
-
-
 Buffer.writeInt8 = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -225,8 +255,6 @@ Buffer.writeInt8 = function(buffer, value, offset, noAssert) {
     buffer[offset] = value;
     return offset + 1;
 };
-
-
 Buffer.writeInt16LE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -237,8 +265,6 @@ Buffer.writeInt16LE = function(buffer, value, offset, noAssert) {
     buffer[offset + 1] = (value >>> 8);
     return offset + 2;
 };
-
-
 Buffer.writeInt16BE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -249,8 +275,6 @@ Buffer.writeInt16BE = function(buffer, value, offset, noAssert) {
     buffer[offset + 1] = value;
     return offset + 2;
 };
-
-
 Buffer.writeInt32LE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
@@ -263,8 +287,6 @@ Buffer.writeInt32LE = function(buffer, value, offset, noAssert) {
     buffer[offset + 3] = (value >>> 24);
     return offset + 4;
 };
-
-
 Buffer.writeInt32BE = function(buffer, value, offset, noAssert) {
     value = +value;
     offset = offset >>> 0;
