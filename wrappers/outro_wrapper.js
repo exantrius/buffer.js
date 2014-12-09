@@ -1,0 +1,4 @@
+
+    window.Buffer = Buffer;
+
+})(window);
