@@ -8,9 +8,18 @@
     "url": "https://github.com/exantrius/buffer.js.git"
   },
   "author": "Andrew Sednev <exantrius@gmail.com>",
-  "license": "MIT",
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
   "bugs": {
     "url": "https://github.com/exantrius/buffer.js/issues"
   },
-  "homepage": "https://github.com/exantrius/buffer.js"
+  "homepage": "https://github.com/exantrius/buffer.js",
+  "devDependencies": {
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-jshint": "~0.6.3"
+  }
 }
