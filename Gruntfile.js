@@ -3,7 +3,10 @@ module.exports = function (grunt) {
 
     var src_files = [
         'wrappers/intro_wrapper.js',
-        'lib/buffer.js',
+        'lib/buffer_ctor.js',
+        'lib/buffer_common.js',
+        'lib/buffer_float.js',
+        'lib/buffer_int.js',
         'wrappers/outro_wrapper.js'
     ];
 
