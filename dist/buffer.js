@@ -5,15 +5,20 @@
  * Licensed MIT
  */
 (function(window) {
-function Buffer() {}
+function Buffer() {
 
+
+
+
+}
 function checkOffset(offset, ext, length) {
     if (offset < 0 || offset + ext > length) {
         throw new RangeError('index out of range');
     }
 }
 
-//-----------------------------------------------------------
+/* global checkOffset: true */
+
 function readFloatGeneric(buffer, offset, precision, isBigEndian) {
     var value = 0;
 
@@ -65,7 +70,8 @@ Buffer.readFloatBE = function (buffer, offset, noAssert) {
     return readFloatGeneric(buffer, offset, 4, true);
     
 };
-//-----------------------------------------------------------
+/* global checkOffset: true */
+
 Buffer.readUInt8 = function(buffer, offset, noAssert) {
     offset = ~~offset;
     if (!noAssert) {
@@ -304,7 +310,6 @@ Buffer.writeInt32BE = function(buffer, value, offset, noAssert) {
     buffer[offset + 3] = value;
     return offset + 4;
 };
-
 
     window.Buffer = Buffer;
 
